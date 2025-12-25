@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/title.unity
+    guid: 860257af288d4f2448721514ca5fcd51
+  - enabled: 1
+    path: Assets/Scenes/main world.unity
+    guid: 0b35b90b5fe6224408ecf54c1398b55b
+  - enabled: 1
+    path: Assets/Scenes/inspiration hall.unity
+    guid: f7557d6bb98dcdc4f8589d04b458fb70
+  - enabled: 1
+    path: Assets/Scenes/day1cutscene.unity
+    guid: 9314dac767ebda34f82d9af0f1089e29
+  - enabled: 1
+    path: Assets/Scenes/day2cutscene.unity
+    guid: f17b858fb6f7cc644bfa8d4f4aea7f08
+  - enabled: 1
+    path: Assets/Scenes/endings/end of demo.unity
+    guid: 7e7e255fcfec93945943d42902dd29a6
+  - enabled: 1
+    path: Assets/Scenes/endings/unprepared ending.unity
+    guid: 5b38059a82229e24bae881523568e8fa
+  - enabled: 1
+    path: Assets/Scenes/endings/suiside ending.unity
+    guid: 28e5ede7c000f9646a8c7dfedb30647e
+  - enabled: 1
+    path: Assets/Scenes/endings/cought ending.unity
+    guid: f4b8c4763c8f35d4183c579b2f693c1f
+  - enabled: 1
+    path: Assets/Scenes/endings/combustion ending.unity
+    guid: c6255bd55f3d72644b4999ac0d651c49
+  - enabled: 1
+    path: Assets/Scenes/endings/2 birds 1 stone.unity
+    guid: 1aab01de70e373f4a8ebce4682710f57
+  - enabled: 1
+    path: Assets/Scenes/boneCave.unity
+    guid: c95d701676952e440b71e8aa18282a79
+  m_configObjects: {}

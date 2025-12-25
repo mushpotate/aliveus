@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b75c95f34a00d4e8c04f76b73312e6, type: 3}
+  m_Name: New Animated Tile
+  m_EditorClassIdentifier: 
+  m_AnimatedSprites:
+  - {fileID: 808681486, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: 872387579, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: -511283505, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: 1979611133, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: -1327145771, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: 1928767310, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: 624898652, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: 472563985, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: 1945138590, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: 1140611782, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: -324609448, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: -407149459, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: -220705952, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: -817155040, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: -667612109, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: 1541746159, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: -947527157, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: 467756905, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: -467816455, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: -18591102, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: -2074446883, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: 958701951, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: -178657497, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: -16521652, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: 2028272732, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: 187913398, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: -1909944433, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: 1479085055, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: -387481595, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: -679827721, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: -2037597040, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  - {fileID: -17879808, guid: 983ae67ee24fc57409bc4aab7b300811, type: 3}
+  m_MinSpeed: 5
+  m_MaxSpeed: 5
+  m_AnimationStartTime: 0
+  m_AnimationStartFrame: 0
+  m_TileColliderType: 0
