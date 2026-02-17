@@ -12,6 +12,8 @@ public class Dialogue
 
     [TextArea(3,10)]
     public string[] sentences;
+    public Question[] questions;
+    //public int maxQuestion = 0;
 
 
     

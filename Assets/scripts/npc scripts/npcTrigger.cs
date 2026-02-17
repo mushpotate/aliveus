@@ -7,6 +7,10 @@ public class npcTrigger : MonoBehaviour
 {
     public Dialogue[] dialogue;
 
+    public Dialogue[] questions;
+    //public string[] questionPrompt;
+    //private bool askingQuestion;
+
     public Sprite t1;
     public Sprite t2;
     public Sprite t3;

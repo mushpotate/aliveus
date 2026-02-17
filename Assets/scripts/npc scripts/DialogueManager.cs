@@ -18,6 +18,12 @@ public class DialogueManager : MonoBehaviour
 
     public Animator itemAnimator;
 
+    public Animator questionBack;
+    public Animator questionCurser;
+    private bool askingQuestion;
+    private int questionSelected = 1;
+    private int maxQuestion = 0;
+
     private Queue<string> sentences;
 
     private bool NPC;
@@ -30,17 +36,24 @@ public class DialogueManager : MonoBehaviour
 
     private bool sentenceOver = false;
 
-    
+    Dialogue d;
+
+    public TextMeshProUGUI[] questionText = new TextMeshProUGUI[5];
+
+
 
     // Start is called before the first frame update
     void Start()
     {
+        askingQuestion = false;
         sentences = new Queue<string>();
 
     }
 
     public void StartDialogue(Dialogue[] dialogue, bool npc,int numTimesTalked)
     {
+        d = dialogue[numTimesTalked];
+
         stoped = false;
 
         //Debug.Log("starting convo with " + dialogue.name);
@@ -62,7 +75,7 @@ public class DialogueManager : MonoBehaviour
 
     public void skipToEnd(bool npc)
     {
-        if (sentenceOver)
+        if (sentenceOver )
         {
             sentenceOver = false;
             DisplayNext(npc);
@@ -81,8 +94,19 @@ public class DialogueManager : MonoBehaviour
 
         if (sentences.Count == 0)
         {
-            EndDialogue(npc);
-            return;
+            if(d.questions.Length != 0)
+            {
+                asking(d.questions.Length);
+                maxQuestion = d.questions.Length;
+                return;
+                //still need to add the continuation after you choose a question option
+            }
+            else
+            {
+                EndDialogue(npc);
+                return;
+            }
+
         }
 
         string sentence = sentences.Dequeue();
@@ -96,8 +120,104 @@ public class DialogueManager : MonoBehaviour
 
     }
 
+    public void asking(int numQuestions)
+    {
+        for(int i =0; i < numQuestions; i++)
+        {
+            questionText[i].text = d.questions[i].prompt;
+        }
+        askingQuestion = true;  
+        questionBack.SetBool("open", askingQuestion);
+        questionBack.SetInteger("question", numQuestions);
+        questionSelected = 1;
+        questionCurser.SetInteger("question", questionSelected);
+        //StartCoroutine(curserMove());
+    }
+
+    IEnumerator curserMove()
+    {
+        while (askingQuestion)
+        {
+            yield return new WaitForEndOfFrame();
+
+            if (Input.GetKey(KeyCode.W)) 
+            {
+                moveCurserUp();
+                yield return new WaitForSeconds(.15f);
+            }
+            else if (Input.GetKey(KeyCode.S))
+            {
+                moveCurserDown();
+                yield return new WaitForSeconds(.15f);
+            }
+
+        }
+    }
+
+    private void Update()
+    {
+        if (askingQuestion)
+        {
+            if (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Space))
+            {
+                askedQuestion();
+
+            }
+            else if (Input.GetKeyDown(KeyCode.W))
+            {
+                moveCurserUp();
+            }
+            else if (Input.GetKeyDown(KeyCode.S))
+            {
+                moveCurserDown();
+            }
+        }
+        
+    }
+
+    private void askedQuestion()
+    {
+        askingQuestion = false;
+        questionBack.SetBool("open", false);
+        foreach (string sentence in d.questions[questionSelected -1].questionPath)
+        {
+            sentences.Enqueue(sentence);
+        }
+        DisplayNext(true);
+
+    }
+
+    public void moveCurserUp()
+    {
+        if (questionSelected == 1)
+        {
+            questionSelected = maxQuestion;
+        }
+        else
+        {
+            questionSelected--;
+        }
+        questionCurser.SetInteger("question", questionSelected);
+
+    }
+
+    public void moveCurserDown()
+    {
+        if (questionSelected == maxQuestion)
+        {
+            questionSelected = 1;
+        }
+        else
+        {
+            questionSelected++;
+        }
+        questionCurser.SetInteger("question", questionSelected);
+
+    }
+
     IEnumerator typeSentence (string sentance, bool npc)
     {
+
         Sprite talk1 = null;
         Sprite talk2 = null;
         Sprite talk3 = null;
@@ -127,6 +247,9 @@ public class DialogueManager : MonoBehaviour
 
         foreach (char letter in sentance.ToCharArray())
         {
+            //might need to call a sep function to start question making process
+            //if (askingQuestion) { maxQuestion = letter; break;  }
+            //if(letter == '?') { askingQuestion = true; continue; }
 
             if (npc)
             {
