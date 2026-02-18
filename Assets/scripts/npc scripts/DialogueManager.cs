@@ -35,11 +35,13 @@ public class DialogueManager : MonoBehaviour
     private bool stoped = false;
 
     private bool sentenceOver = false;
+    private bool inQuestion = false;
 
     Dialogue d;
 
     public TextMeshProUGUI[] questionText = new TextMeshProUGUI[5];
 
+    
 
 
     // Start is called before the first frame update
@@ -75,13 +77,18 @@ public class DialogueManager : MonoBehaviour
 
     public void skipToEnd(bool npc)
     {
+        
+        if (askingQuestion) { return; }
+
         if (sentenceOver )
         {
             sentenceOver = false;
             DisplayNext(npc);
+            //Debug.Log("desplayed next");
         }
         else
         {
+            //Debug.Log("skipped");
             skip = true;
         }
 
@@ -96,6 +103,12 @@ public class DialogueManager : MonoBehaviour
         {
             if(d.questions.Length != 0)
             {
+                if (!d.questions[questionSelected - 1].returnable && inQuestion)
+                {
+                    inQuestion = false;
+                    EndDialogue(npc);
+                    return;
+                }
                 asking(d.questions.Length);
                 maxQuestion = d.questions.Length;
                 return;
@@ -122,6 +135,8 @@ public class DialogueManager : MonoBehaviour
 
     public void asking(int numQuestions)
     {
+        sentenceOver = true;
+        inQuestion = false;
         for(int i =0; i < numQuestions; i++)
         {
             questionText[i].text = d.questions[i].prompt;
@@ -175,15 +190,26 @@ public class DialogueManager : MonoBehaviour
         
     }
 
+    private void talkingPointsManagment()
+    {
+        if (d.questions[questionSelected - 1].testPoint)
+        {
+            //add a point or do something
+            //for example if you choose to lift weights or listen to sailors rants
+        }
+    }
+
     private void askedQuestion()
     {
         askingQuestion = false;
+        inQuestion = true;
+        talkingPointsManagment();
         questionBack.SetBool("open", false);
         foreach (string sentence in d.questions[questionSelected -1].questionPath)
         {
             sentences.Enqueue(sentence);
         }
-        DisplayNext(true);
+        //DisplayNext(true);
 
     }
 

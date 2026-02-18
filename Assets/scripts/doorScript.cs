@@ -11,7 +11,7 @@ public class doorScript : MonoBehaviour
 
     public bool same = false;
 
-    public Vector2 destination;
+    private Vector2 destination;
 
     public bool darken = false;
 
@@ -21,12 +21,21 @@ public class doorScript : MonoBehaviour
 
     public bool difRoom = false;
 
+    public bool isEntryDoor;
+    public bool isVertical;
 
 
 
+    void Awake()
+    {
+        destination = new Vector2(transform.GetChild(0).position.x, transform.GetChild(0).position.y);
+        //Debug.Log(destination + "");
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+
+
         if (collision.gameObject.tag == "player")
         {
             
