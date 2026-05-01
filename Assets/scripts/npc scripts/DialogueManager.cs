@@ -331,7 +331,7 @@ public class DialogueManager : MonoBehaviour
             else
             {
                 soundCounter = 0;
-                talkingSprite.sprite = talk1;
+                if (npc) { talkingSprite.sprite = talk1; }
             }
             if (npc) { dialogueText.text += letter; }
             else { itemText.text += letter; }

@@ -6,10 +6,17 @@ public class darknessManager : MonoBehaviour
 {
     public GameObject dark;
     private bool darkend = false;
+
+    public bool darkstart = false;
     // Start is called before the first frame update
     void Start()
     {
-        dark.SetActive(false);
+        if (!darkstart)
+        {
+            dark.SetActive(false);
+        }
+        
+        
     }
 
     
