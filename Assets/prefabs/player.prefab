@@ -159,6 +159,7 @@ MonoBehaviour:
   canWalk: 1
   inConvo: 0
   justTalked: 0
+  settingsAnimator: {fileID: 0}
 --- !u!95 &3612052629108522547
 Animator:
   serializedVersion: 5
@@ -207,6 +208,7 @@ GameObject:
   - component: {fileID: 3612052630084546702}
   - component: {fileID: 3612052630084546673}
   - component: {fileID: 3612052630084546675}
+  - component: {fileID: 6475248529278090891}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -280,3 +282,16 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3612052630084546674}
   m_Enabled: 1
+--- !u!114 &6475248529278090891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3612052630084546674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9143b079ad11da34b959ca77c7b2c424, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  material: {fileID: 2100000, guid: 15788262ccec1fe43aa83015bf11a439, type: 2}
