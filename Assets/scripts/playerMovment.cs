@@ -33,6 +33,8 @@ public class playerMovment : MonoBehaviour
 
     public Animator settingsAnimator;
     private bool settingsOpen = false;
+    private Vector3 hidingSpot;
+    private Vector3 prehidingSpot;
 
 
     Vector2 dest = new(0, 0);
@@ -40,6 +42,9 @@ public class playerMovment : MonoBehaviour
     Vector2 stoped;
 
     Boolean doorOpened = false;
+
+    private bool isHiding = false;
+    private bool canHide = false;
 
     public void gotRobe()
     {
@@ -72,32 +77,28 @@ public class playerMovment : MonoBehaviour
 
     private void OnMovment(InputValue value)
     {
-        if (canWalk)
+        movment = value.Get<Vector2>();
+        if ((movment.x != 0 || movment.y != 0))
         {
-            movment = value.Get<Vector2>();
-            if ((movment.x != 0 || movment.y != 0))
-            {
-                animator.SetFloat("x", movment.x);
-                animator.SetFloat("y", movment.y);
+            animator.SetFloat("x", movment.x);
+            animator.SetFloat("y", movment.y);
 
-                animator.SetBool("isWalking", true);
+            animator.SetBool("isWalking", true);
 
-            }
-            else
-            {
-                animator.SetBool("isWalking", false);
-
-            }
         }
         else
         {
-            movment = new(0, 0);
             animator.SetBool("isWalking", false);
 
         }
     }
 
-    
+    public void hideTrigger(bool canHide,GameObject hidingSpot)
+    {
+        this.canHide = canHide;
+        this.hidingSpot = hidingSpot.transform.position;
+
+    }
 
     private void FixedUpdate()
     {
@@ -207,6 +208,11 @@ public class playerMovment : MonoBehaviour
                 settingsOpen=true;
                 canWalk=false;
             }
+        }
+
+        if (canHide && Input.GetKeyDown(KeyCode.H))
+        {
+            hide();
         }
 
         if (Input.GetKeyDown(KeyCode.N))
@@ -339,6 +345,31 @@ public class playerMovment : MonoBehaviour
     public Vector2 getPos()
     {
         return this.transform.position;
+    }
+
+    private void hide()
+    {
+        if (isHiding)
+        {
+            isHiding = false;
+            this.gameObject.GetComponent<SpriteRenderer>().enabled = true;
+            canWalk = true;
+            this.transform.position = prehidingSpot;
+        }
+        else
+        {
+            isHiding = true;
+            this.gameObject.GetComponent<SpriteRenderer>().enabled = false;
+            canWalk = false;
+            prehidingSpot = this.transform.position;
+            this.transform.position= hidingSpot;
+        }
+        
+    }
+
+    public bool getHiding()
+    {
+        return isHiding;
     }
     
 
