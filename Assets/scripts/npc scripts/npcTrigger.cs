@@ -7,7 +7,7 @@ public class npcTrigger : MonoBehaviour
 {
     public Dialogue[] dialogue;
 
-    public Dialogue[] questions;
+    //public Dialogue[] questions;
     //public string[] questionPrompt;
     //private bool askingQuestion;
 
@@ -309,5 +309,22 @@ public class npcTrigger : MonoBehaviour
 
     }
 
+    //one constructer can be used checks if it should change variable by if its null
+    public void ChangeNpc(Vector3 placement, Sprite defalt, Dialogue[] dialogue, Sprite t1, Sprite t2, Sprite t3)
+    {
+        if(placement!= null) this.transform.position = placement;
+        if (defalt != null) this.defalt = defalt;
 
+        if (dialogue != null) this.dialogue = dialogue;
+        numTimesTalked = 0;
+
+        //if one face expresion is changed all should be
+        if (t1 != null)
+        {
+            this.t1 = t1;
+            this.t2 = t2;
+            this.t3 = t3;
+        }
+      
+    }
 }
