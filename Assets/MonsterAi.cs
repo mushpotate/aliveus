@@ -27,6 +27,9 @@ public class MonsterAi : MonoBehaviour
     private int currentPoint = 0;
     public int numPathPoints = 0;
 
+    [SerializeField] AudioSource backNoise;
+    [SerializeField] AudioSource hello;
+
     enum PathStates
     {
         chasing, stalking, wandering,hiding,patroling
@@ -50,6 +53,16 @@ public class MonsterAi : MonoBehaviour
 
     void updatePath()
     {
+        Debug.Log(state);
+
+        if (!FindFirstObjectByType<playerMovment>().getIisHiding() && state != PathStates.stalking &&  (state == PathStates.wandering || state == PathStates.patroling) && Vector3.Distance(this.transform.position, playerPos.position) <= stalkingRange)
+        {
+            backNoise.Stop();
+            hello.Play(0);
+            state = PathStates.stalking;
+            stopping = false;
+        }
+
         if (!stopping)
         {
             switch (state)
@@ -78,17 +91,29 @@ public class MonsterAi : MonoBehaviour
 
     private void chasing()
     {
-
-        if (seeker.IsDone()) { seeker.StartPath(rb.position, playerPos.position, OnPathComplete); }
+        if (FindFirstObjectByType<playerMovment>().getIisHiding())
+        {
+            state = PathStates.wandering;
+            speed = 300f;
+        }
+        else if (seeker.IsDone()) { seeker.StartPath(rb.position, playerPos.position, OnPathComplete); }
     }
 
     private void stalking()
     {
-        if(rb.velocity == Vector2.zero )
+        if (FindFirstObjectByType<playerMovment>().getIisHiding() && Random.Range(0, 20) == 7)
         {
-            if (Random.Range(0, 50) == 14) { state = PathStates.chasing; }
-            else if (Random.Range(0, 50) == 7) { state = PathStates.patroling; }
+            state = PathStates.wandering;
+        }
+        else if(rb.velocity == Vector2.zero && Vector3.Distance(this.transform.position,playerPos.position) >= stalkingRange-6)
+        {
+            if (Random.Range(0, 20) == 14) { state = PathStates.chasing; backNoise.Play(); speed = 1400; }
             
+            
+        }
+        else if(Vector3.Distance(this.transform.position, playerPos.position) >= stalkingRange-1)
+        {
+            if (Random.Range(0, 20) == 7) { state = PathStates.patroling; backNoise.Play(); }
         }
         if (seeker.IsDone()) {
             seeker.StartPath(rb.position, playerPos.position, OnPathComplete); 
@@ -97,6 +122,7 @@ public class MonsterAi : MonoBehaviour
 
     private void wandering()
     {
+
         if (reachedEndOfPath)
         {
             if (Random.Range(1, 3) == 1)
@@ -109,6 +135,7 @@ public class MonsterAi : MonoBehaviour
             if (seeker.IsDone()) { seeker.StartPath(rb.position, PickRandomPoint(stalkingRange) , OnPathComplete); }
 
         }
+
     }
 
     private void hiding()
@@ -147,6 +174,18 @@ public class MonsterAi : MonoBehaviour
     {
         stopping = true;
         yield return new WaitForSeconds(Random.Range(1, 4));
+        if(Random.Range(1, 10) == 1)
+        {
+            if(state == PathStates.wandering)
+            {
+                state = PathStates.patroling;
+            }
+            else 
+            {
+                state = PathStates.wandering;
+            }
+            
+        }
         stopping = false;
     }
 

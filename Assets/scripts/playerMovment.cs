@@ -46,6 +46,12 @@ public class playerMovment : MonoBehaviour
     private bool isHiding = false;
     private bool canHide = false;
 
+    [SerializeField] bool hasStamina = true;
+    private bool outOfStamina = false;
+    [SerializeField] int maxStamina = 1000;
+    private int stamina;
+    
+
     public void gotRobe()
     {
         hasRobe = true;
@@ -73,6 +79,7 @@ public class playerMovment : MonoBehaviour
     public void Start()
     {
         stoped = rb.position;
+        stamina = maxStamina;
     }
 
     private void OnMovment(InputValue value)
@@ -100,6 +107,11 @@ public class playerMovment : MonoBehaviour
 
     }
 
+    public bool getIisHiding()
+    {
+        return isHiding;
+    }
+
     private void FixedUpdate()
     {
 
@@ -115,6 +127,35 @@ public class playerMovment : MonoBehaviour
 
             doorOpened = false;
         }
+
+        //Debug.Log(stamina);
+
+        if (hasStamina)
+        {
+            if (!sprinting && stamina < maxStamina)
+            {
+                stamina++;
+                if (outOfStamina && stamina == maxStamina)
+                {
+                    outOfStamina = false;
+                }
+            }
+            else if (sprinting)
+            {
+
+                if (--stamina == 0)
+                {
+
+                    outOfStamina = true;
+                    sprinting = false;
+                    speed = walk;
+                }
+
+
+
+            }
+        }
+        
 
     }
 
@@ -194,7 +235,18 @@ public class playerMovment : MonoBehaviour
     {
         //if the player is in range of an npc the question mark will show obove the npc
 
-        if(Input.GetKeyDown(KeyCode.Escape))
+        if (!sprinting && !outOfStamina && stamina > 0 && Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            speed = sprint;
+            sprinting = true;
+        }
+        else if (sprinting && Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            speed = walk;
+            sprinting = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             if(settingsOpen)
             {
@@ -210,7 +262,7 @@ public class playerMovment : MonoBehaviour
             }
         }
 
-        if (canHide && Input.GetKeyDown(KeyCode.H))
+        if (canHide && Input.GetKeyDown(KeyCode.E))
         {
             hide();
         }
@@ -234,23 +286,7 @@ public class playerMovment : MonoBehaviour
             }
         }
 
-            if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            if (!sprinting)
-            {
-                speed = sprint;
-                sprinting = true;
-            }
-        }
-
-        if (Input.GetKeyUp(KeyCode.LeftShift))
-        {
-            if (sprinting)
-            {
-                speed = walk;
-                sprinting = false;
-            }
-        }
+        
 
         if (inConvo && Input.GetKeyDown(KeyCode.E) && justStarted == false)
         {
@@ -367,10 +403,7 @@ public class playerMovment : MonoBehaviour
         
     }
 
-    public bool getHiding()
-    {
-        return isHiding;
-    }
+    
     
 
 }

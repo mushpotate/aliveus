@@ -30,11 +30,11 @@ public class higherEventManager : MonoBehaviour
 
         foreach(GameObject specificEvent in gameObject.transform)
         {
-            GameObject SpecialEventTemp = specificEvent..GetComponent<basicEventManger>().getSpecialEvent();
+            GameObject SpecialEventTemp = specificEvent.GetComponent<basicEventManger>().getSpecialEvent();
             if(SpecialEventTemp != null)
             {
                 //figure out how to call it based on the interface rather then the custom script!!!
-                SpecialEventTemp.
+                //SpecialEventTemp.
             }
         }
 
