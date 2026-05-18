@@ -31,7 +31,11 @@ public class sceneManager : MonoBehaviour
 
     public void Start()
     {
-        StartCoroutine(delayStart());
+        if(FindAnyObjectByType<playerMovment>() != null)
+        {
+            StartCoroutine(delayStart());
+        }
+        
     }
 
     private IEnumerator delayStart()

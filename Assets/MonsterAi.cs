@@ -23,12 +23,19 @@ public class MonsterAi : MonoBehaviour
     Rigidbody2D rb;
 
     public GameObject pathParent;
-    [SerializeField] GameObject[] pathPoints;
+    [SerializeField] List<Transform> pathPoints;
     private int currentPoint = 0;
-    public int numPathPoints = 0;
+    private int numPathPoints = 0;
+    [SerializeField] int startingPoint = 0;
+    [SerializeField] int chanceToWander;
+    [SerializeField] int chanceToHide;
+    [SerializeField] int baseSpeed;
+    [SerializeField] int chaseSpeed;
 
     [SerializeField] AudioSource backNoise;
     [SerializeField] AudioSource hello;
+    [SerializeField] GameObject monsterHidingSpots;
+    [SerializeField] GameObject body;
 
     enum PathStates
     {
@@ -43,7 +50,14 @@ public class MonsterAi : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        this.transform.position = pathPoints[currentPoint].transform.position;
+        speed = baseSpeed;
+        foreach(Transform pp in pathParent.transform)
+        {
+            pathPoints.Add(pp);
+        }
+        //pathPoints = pathParent.GetComponentsInChildren<GameObject>();
+        this.transform.position = pathPoints[startingPoint].transform.position;
+        currentPoint = startingPoint;
         seeker = GetComponent<Seeker>();
         rb = GetComponent<Rigidbody2D>();
 
@@ -51,9 +65,36 @@ public class MonsterAi : MonoBehaviour
         
     }
 
+    private Vector3 getClosestHidingSpot()
+    {
+        //List<Transform> list = monsterHidingSpots.GetComponentInChildren<Transform>();
+        Vector3 closest = Vector3.zero;
+        foreach(Transform spot in monsterHidingSpots.transform)
+        {
+            if(closest != Vector3.zero)
+            {
+                if(Vector3.Distance(closest,this.gameObject.transform.position) > Vector3.Distance(spot.transform.position, this.gameObject.transform.position))
+                {
+                    closest = spot.transform.position;
+                }
+            }
+            else
+            {
+                closest = spot.transform.position;
+            }
+        }
+        return closest;
+    }
     void updatePath()
     {
-        Debug.Log(state);
+        //Debug.Log(state);
+
+        if((state == PathStates.wandering || state == PathStates.patroling) && Random.Range(0, chanceToHide) == 7)
+        {
+            seeker.StartPath(rb.position, getClosestHidingSpot(), OnPathComplete);
+            state = PathStates.hiding;
+
+        }
 
         if (!FindFirstObjectByType<playerMovment>().getIisHiding() && state != PathStates.stalking &&  (state == PathStates.wandering || state == PathStates.patroling) && Vector3.Distance(this.transform.position, playerPos.position) <= stalkingRange)
         {
@@ -94,7 +135,7 @@ public class MonsterAi : MonoBehaviour
         if (FindFirstObjectByType<playerMovment>().getIisHiding())
         {
             state = PathStates.wandering;
-            speed = 300f;
+            speed = baseSpeed;
         }
         else if (seeker.IsDone()) { seeker.StartPath(rb.position, playerPos.position, OnPathComplete); }
     }
@@ -107,7 +148,7 @@ public class MonsterAi : MonoBehaviour
         }
         else if(rb.velocity == Vector2.zero && Vector3.Distance(this.transform.position,playerPos.position) >= stalkingRange-6)
         {
-            if (Random.Range(0, 20) == 14) { state = PathStates.chasing; backNoise.Play(); speed = 1400; }
+            if (Random.Range(0, 20) == 14) { state = PathStates.chasing; backNoise.Play(); speed = chaseSpeed; }
             
             
         }
@@ -141,11 +182,20 @@ public class MonsterAi : MonoBehaviour
     private void hiding()
     {
         //find a place to hide and wait for a bit
+        if (reachedEndOfPath && body.GetComponent<SpriteRenderer>().enabled)
+        {
+            body.GetComponent<SpriteRenderer>().enabled = false;
+        }
+        else if (!body.GetComponent<SpriteRenderer>().enabled && Random.Range(1, 20) == 1)
+        {
+            body.GetComponent<SpriteRenderer>().enabled = true;
+            state = PathStates.patroling;
+        }
     }
 
     private void patroling()
     {
-
+        //Debug.Log("current point: " + currentPoint);
 
         if (reachedEndOfPath)
         {
@@ -156,7 +206,7 @@ public class MonsterAi : MonoBehaviour
             }
 
             reachedEndOfPath = false;
-            if(currentPoint == pathPoints.Length - 1)
+            if(currentPoint == pathPoints.Count - 1)
             {
                 currentPoint = 0;
             }
@@ -174,17 +224,12 @@ public class MonsterAi : MonoBehaviour
     {
         stopping = true;
         yield return new WaitForSeconds(Random.Range(1, 4));
-        if(Random.Range(1, 10) == 1)
+        if(state == PathStates.wandering && Random.Range(1, 10) == 1)
         {
-            if(state == PathStates.wandering)
-            {
-                state = PathStates.patroling;
-            }
-            else 
-            {
-                state = PathStates.wandering;
-            }
-            
+            state = PathStates.patroling;
+        }else if(state == PathStates.patroling && Random.Range(1, chanceToWander) == 1)
+        {
+            state = PathStates.wandering;
         }
         stopping = false;
     }
@@ -232,22 +277,22 @@ public class MonsterAi : MonoBehaviour
     //makes adding path points smoother, does it by itself :)
     private void OnValidate()
     {
-        if (numPathPoints == pathPoints.Length)
+        if (numPathPoints == pathPoints.Count)
         {
             return;
         }
-        else if (numPathPoints < pathPoints.Length)
+        else if (numPathPoints < pathPoints.Count)
         {
 
 
             UnityEditor.EditorApplication.delayCall += () =>
             {
-                while (numPathPoints < pathPoints.Length)
+                while (numPathPoints < pathPoints.Count)
                 {
                     numPathPoints++;
-                    GameObject pp = new GameObject("path point: " + numPathPoints);
-                    pp.transform.SetParent(pathParent.transform);
-                    pp.transform.localPosition = Vector3.zero;
+                    Transform pp = new GameObject("path point: " + numPathPoints).transform;
+                    pp.SetParent(pathParent.transform);
+                    pp.localPosition = Vector3.zero;
                     pathPoints[numPathPoints - 1] = pp;
                 }
 
@@ -257,7 +302,7 @@ public class MonsterAi : MonoBehaviour
 
         else
         {
-            while (numPathPoints > pathPoints.Length)
+            while (numPathPoints > pathPoints.Count)
             {
                 GameObject pp = (pathParent.transform.Find("path point: " + numPathPoints)).gameObject;
                 UnityEditor.EditorApplication.delayCall += () =>

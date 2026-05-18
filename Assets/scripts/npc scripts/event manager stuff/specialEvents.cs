@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface specialEvents
+[System.Serializable]
+public class specialEvents
 {
-    //all the custom scripts that are for specific events will need to impiment this interface
-    GameObject[] getRequiredEvents();
+    public GameObject[] events;
+    public npcChange[] npcChanges;
 }

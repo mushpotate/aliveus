@@ -8,6 +8,7 @@ public class sceneDoor : MonoBehaviour
     public string level;
     public AudioSource audioSource;
     public Animator transition;
+    [SerializeField] bool progressDay = false;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -17,6 +18,7 @@ public class sceneDoor : MonoBehaviour
         }
         else
         {
+            if (progressDay) { FindAnyObjectByType<gameManager>().day++; }
             transition.SetBool("start", true);
             audioSource.Play(0);
             FindObjectOfType<playerMovment>().slowed();

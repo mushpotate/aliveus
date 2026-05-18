@@ -29,6 +29,8 @@ public class gameManager : MonoBehaviour
         
     }
 
+    public int day = 1;
+
     public GameObject intro;
     public GameObject warnings;
     public GameObject logo;

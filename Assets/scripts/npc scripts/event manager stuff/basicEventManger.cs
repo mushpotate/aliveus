@@ -7,11 +7,22 @@ public class basicEventManger : MonoBehaviour
     //day 2 will be the default for imediate changes
     [SerializeField] npcChange[] day2AffectedNPCS;
     [SerializeField] npcChange[] day3AffectedNPCS;
-    [SerializeField] GameObject specialEvent;
+    [SerializeField] specialEvents specialEvent;
 
     private bool isActivated = false;
 
-    public GameObject getSpecialEvent()
+    public npcChange[] getChanges()
+    {
+        if (FindAnyObjectByType<gameManager>().day == 2)
+        {
+            return day2AffectedNPCS;
+        }
+        else
+        {
+            return day3AffectedNPCS;
+        }
+    }
+    public specialEvents getSpecialEvent()
     {
         return specialEvent;
     }
