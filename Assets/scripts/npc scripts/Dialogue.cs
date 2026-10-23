@@ -10,9 +10,9 @@ public class Dialogue
 
     public string name;
 
-    [TextArea(3,10)]
-    public string[] sentences;
-    public Question[] questions;
+    public sentencePiece[] sentences;
+
+    //public HasQuestion question;
     //public int maxQuestion = 0;
 
 

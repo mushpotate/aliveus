@@ -5,12 +5,10 @@ using UnityEngine;
 [System.Serializable]
 public class Question
 {
-    public bool returnable = false;
+    //public bool returnable = false;
     public string prompt;
+    public int questionExitPath;
 
-    [TextArea(3, 10)]
-    public string[] questionPath;
-
-    public bool testPoint = false;
+    //public bool testPoint = false;
 
 }

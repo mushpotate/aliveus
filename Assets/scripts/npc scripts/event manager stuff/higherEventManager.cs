@@ -79,7 +79,7 @@ public class higherEventManager : MonoBehaviour
         //implimenting all the changes
         foreach(npcChange change in priorityChanges)
         {
-            change.npc.GetComponent<npcTrigger>().ChangeNpc(change.placement, change.defalt, change.dialogue, change.t1, change.t2, change.t3);
+            //change.npc.GetComponent<npcTrigger>().ChangeNpc(change.placement, change.defalt, change.dialogue, change.t1, change.t2, change.t3);
         }
 
     }

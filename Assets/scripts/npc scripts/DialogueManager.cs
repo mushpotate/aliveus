@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,7 +25,7 @@ public class DialogueManager : MonoBehaviour
     private int questionSelected = 1;
     private int maxQuestion = 0;
 
-    private Queue<string> sentences;
+    private Queue<sentencePiece> sentences;
 
     private bool NPC;
 
@@ -37,6 +38,8 @@ public class DialogueManager : MonoBehaviour
     private bool sentenceOver = false;
     private bool inQuestion = false;
 
+    private npcTrigger currentNpc; 
+
     Dialogue d;
 
     public TextMeshProUGUI[] questionText = new TextMeshProUGUI[5];
@@ -48,12 +51,13 @@ public class DialogueManager : MonoBehaviour
     void Start()
     {
         askingQuestion = false;
-        sentences = new Queue<string>();
+        sentences = new Queue<sentencePiece>();
 
     }
 
     public void StartDialogue(Dialogue[] dialogue, bool npc,int numTimesTalked)
     {
+        lastQuestionSentence = null;
         d = dialogue[numTimesTalked];
 
         stoped = false;
@@ -63,24 +67,42 @@ public class DialogueManager : MonoBehaviour
 
         sentences.Clear();
 
-        if (npc) { animator.SetBool("isOpen", true); }
+        if (npc) {
+            animator.SetBool("isOpen", true); 
+            currentNpc = FindObjectOfType<playerMovment>().getNPC().GetComponent<npcTrigger>();
+        }
         else { itemAnimator.SetBool("isOpen", true); }
-        
 
-        foreach (string sentence in dialogue[numTimesTalked].sentences)
+        //Debug.Log(numTimesTalked);
+        foreach (sentencePiece sp in dialogue[numTimesTalked].sentences)
         {
-            sentences.Enqueue(sentence);
+            //creat a method that only enques till it hits a question, so that i can clear the queue and start it at the next question
+            sentences.Enqueue(sp);
+            //Debug.Log(sp);
+            if (sp.question.questionPrompts.Length != 0)
+            {
+                break;
+            }
         }
 
         DisplayNext(npc);
     }
 
+
     public void skipToEnd(bool npc)
     {
-        
+        if (lastQuestionSentence.question.questionPrompts.Length != 0)
+        {
+            Question[] questions = lastQuestionSentence.question.questionPrompts;
+            asking(questions);
+            maxQuestion = questions.Length;
+            skip = true;
+            //return;
+        }
+
         if (askingQuestion) { return; }
 
-        if (sentenceOver )
+        if (sentenceOver && !inQuestion)
         {
             sentenceOver = false;
             DisplayNext(npc);
@@ -97,33 +119,32 @@ public class DialogueManager : MonoBehaviour
 
     public void DisplayNext(bool npc)
     {
+        if (inQuestion)
+        {
+            
+            sentenceOver = true;
+            return;
+        }
         NPC = npc;
-
+        //if (lastQuestionSentence != null) { Debug.Log("last q asked: " + lastQuestionSentence.text + " is end? " + lastQuestionSentence.isEnd()); }
+        
+        if (lastQuestionSentence != null && lastQuestionSentence.isEnd())
+        {
+            EndDialogue(npc);
+            return;
+        }
+        
         if (sentences.Count == 0)
         {
-            if(d.questions.Length != 0)
-            {
-                if (!d.questions[questionSelected - 1].returnable && inQuestion)
-                {
-                    inQuestion = false;
-                    EndDialogue(npc);
-                    return;
-                }
-                asking(d.questions.Length);
-                maxQuestion = d.questions.Length;
-                return;
-                //still need to add the continuation after you choose a question option
-            }
-            else
-            {
-                EndDialogue(npc);
-                return;
-            }
+            EndDialogue(npc);
+            return;
+
 
         }
 
-        string sentence = sentences.Dequeue();
-
+        
+        sentencePiece sentence = sentences.Dequeue();
+        lastQuestionSentence = sentence;
         StopAllCoroutines();
         FindObjectOfType<npcTrigger>().stopAudio();
         skip = false;
@@ -133,20 +154,42 @@ public class DialogueManager : MonoBehaviour
 
     }
 
-    public void asking(int numQuestions)
+    //private Coroutine cuMo;
+    public void asking(Question[] questions)
     {
+        if (inQuestion) { return; }
         sentenceOver = true;
-        inQuestion = false;
-        for(int i =0; i < numQuestions; i++)
+        inQuestion = true;
+        for (int i = 0; i < questions.Length; i++)
         {
-            questionText[i].text = d.questions[i].prompt;
+            questionText[i].text = questions[i].prompt;
         }
-        askingQuestion = true;  
+        //Debug.Log("got here?");
+        //StartCoroutine(askQuest(questions));
+        askingQuestion = true;
         questionBack.SetBool("open", askingQuestion);
-        questionBack.SetInteger("question", numQuestions);
+        questionBack.SetInteger("question", questions.Length);
         questionSelected = 1;
         questionCurser.SetInteger("question", questionSelected);
-        //StartCoroutine(curserMove());
+        //if (cuMo == null) { cuMo = StartCoroutine(curserMove()); }
+    }
+
+    IEnumerator askQuest(Question[] questions)
+    {
+        //Debug.Log("got here??");
+        inQuestion = true;
+        while (!sentenceOver)
+        {
+            yield return new WaitForSeconds(.1f);
+            //Debug.Log("any day now...");
+        }
+        //Debug.Log("got here???");
+        askingQuestion = true;
+        questionBack.SetBool("open", askingQuestion);
+        questionBack.SetInteger("question", questions.Length);
+        questionSelected = 1;
+        questionCurser.SetInteger("question", questionSelected);
+
     }
 
     IEnumerator curserMove()
@@ -158,15 +201,16 @@ public class DialogueManager : MonoBehaviour
             if (Input.GetKey(KeyCode.W)) 
             {
                 moveCurserUp();
-                yield return new WaitForSeconds(.15f);
+                yield return new WaitForSeconds(1.15f);
             }
             else if (Input.GetKey(KeyCode.S))
             {
                 moveCurserDown();
-                yield return new WaitForSeconds(.15f);
+                yield return new WaitForSeconds(1.15f);
             }
 
         }
+        //cuMo = null;
     }
 
     private void Update()
@@ -192,25 +236,41 @@ public class DialogueManager : MonoBehaviour
 
     private void talkingPointsManagment()
     {
-        if (d.questions[questionSelected - 1].testPoint)
-        {
+        //if (d.question.questionPrompts[questionSelected - 1].testPoint)
+        //{
             //add a point or do something
             //for example if you choose to lift weights or listen to sailors rants
-        }
+        //}
     }
 
+    private sentencePiece lastQuestionSentence;
     private void askedQuestion()
     {
-        askingQuestion = false;
-        inQuestion = true;
+
+        inQuestion = false;
         talkingPointsManagment();
         questionBack.SetBool("open", false);
-        foreach (string sentence in d.questions[questionSelected -1].questionPath)
+        //d = d.question.questionPrompts[questionSelected - 1].questionPath[0];
+        //= sentences.Peek().question.questionPrompts[questionSelected - 1].questionExitPath;
+        for (int i = lastQuestionSentence.question.questionPrompts[questionSelected - 1].questionExitPath; i < d.sentences.Length; i++)
         {
-            sentences.Enqueue(sentence);
+            sentences.Enqueue(d.sentences[i]);
+            //Debug.Log(d.sentences[i].text);
+            if (d.sentences[i].question.questionPrompts.Length != 0)
+            {
+                break;
+            }
         }
-        //DisplayNext(true);
+        sentenceOver = false;
+        DisplayNext(true);
+        StartCoroutine(questionAskedDellay());
 
+    }
+
+    IEnumerator questionAskedDellay()
+    {
+        yield return new WaitForSeconds(.1f);
+        askingQuestion = false;
     }
 
     public void moveCurserUp()
@@ -241,18 +301,18 @@ public class DialogueManager : MonoBehaviour
 
     }
 
-    IEnumerator typeSentence (string sentance, bool npc)
+    IEnumerator typeSentence (sentencePiece s, bool npc)
     {
-
+        string sentance = s.text;
         Sprite talk1 = null;
         Sprite talk2 = null;
         Sprite talk3 = null;
 
         if (npc)
         {
-             talk1 = FindObjectOfType<playerMovment>().getNPC().GetComponent<npcTrigger>().getT1();
-             talk2 = FindObjectOfType<playerMovment>().getNPC().GetComponent<npcTrigger>().getT2(); ;
-             talk3 = FindObjectOfType<playerMovment>().getNPC().GetComponent<npcTrigger>().getT3(); ;
+             talk1 = currentNpc.getT1();
+             talk2 = currentNpc.getT2(); ;
+             talk3 = currentNpc.getT3(); ;
 
             talkingSprite.sprite = talk1;
         }
@@ -270,6 +330,9 @@ public class DialogueManager : MonoBehaviour
             itemText.text = "";
         }
         
+        yield return new WaitForSeconds(.3f);
+
+        float talkSpeed = currentNpc.getTalkSpeed();
 
         foreach (char letter in sentance.ToCharArray())
         {
@@ -304,9 +367,12 @@ public class DialogueManager : MonoBehaviour
                 }
             }
 
-            
+            //Debug.Log("hello?");
 
-            if (letter != ' ' && stoped == false)
+            if (npc) { dialogueText.text += letter; }
+            else { itemText.text += letter; }
+
+            if (stoped == false && letter != ' ' && letter != '.' && letter != ',')
             {
                 
                 if(soundCounter == 0 || soundCounter%3 == 0)
@@ -322,28 +388,44 @@ public class DialogueManager : MonoBehaviour
                             talkingSprite.sprite = talk2;
                         }
                     }
-                    
-                    FindObjectOfType<playerMovment>().getNPC().GetComponent<npcTrigger>().playAudio();
+
+                    currentNpc.playAudio();
                 }
                 soundCounter++;
 
             }
             else
             {
+                //Debug.Log("tried");
                 soundCounter = 0;
                 if (npc) { talkingSprite.sprite = talk1; }
+                if (letter == '.')
+                {
+                    //Debug.Log("waited");
+                    yield return new WaitForSeconds(.4f);
+                }
+                else if (letter == ',')
+                {
+                    //Debug.Log("waited");
+                    yield return new WaitForSeconds(.8f);
+                }
             }
-            if (npc) { dialogueText.text += letter; }
-            else { itemText.text += letter; }
+            
 
             if (dialogueText.text == (sentance) || itemText.text == (sentance))
             {
                 sentenceOver = true;
             }
 
-            yield return new WaitForSeconds(FindObjectOfType<playerMovment>().getNPC().GetComponent<npcTrigger>().getTalkSpeed());
+            yield return new WaitForSeconds(talkSpeed);
         }
         if (npc) { talkingSprite.sprite = talk1; }
+        if(s.question.questionPrompts.Length != 0)
+        {
+            Question[] questions = lastQuestionSentence.question.questionPrompts;
+            asking(questions);
+            maxQuestion = questions.Length;
+        }
         
     }
         
@@ -352,9 +434,9 @@ public class DialogueManager : MonoBehaviour
     void EndDialogue(bool npc)
     {
         //Debug.Log("end");
-        FindObjectOfType<playerMovment>().getNPC().GetComponent<npcTrigger>().resetPos();
+        currentNpc.resetPos();
         stoped = true;
-        FindObjectOfType<npcTrigger>().stopAudio();
+        currentNpc.stopAudio();
         if (npc) 
         {
             animator.SetBool("isOpen", false); 

@@ -21,7 +21,10 @@ public class gameManager : MonoBehaviour
         else
         {
             instance = this;
-            StartCoroutine(playIntro());
+            if (FindFirstObjectByType<sceneManager>().getScene() == "title")
+            {
+                StartCoroutine(playIntro());
+            }
             //audioLevel = .25f;
         }
 
@@ -211,5 +214,23 @@ public class gameManager : MonoBehaviour
     public bool isSecretDoor()
     {
         return secretDoor;
+    }
+
+    public void nextDay()
+    {
+        day++;
+        FindFirstObjectByType<weatherManager>().setWeather(day);
+        if(day == 2)
+        {
+            //add rain
+        }
+        else if(day == 3)
+        {
+            //add fog
+        }
+        else
+        {
+            //trigger final day endings
+        }
     }
 }

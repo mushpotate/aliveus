@@ -84,7 +84,27 @@ public class playerMovment : MonoBehaviour
 
     private void OnMovment(InputValue value)
     {
+        
         movment = value.Get<Vector2>();
+        if (!canWalk) return;
+        if ((movment.x != 0 || movment.y != 0))
+        {
+            animator.SetFloat("x", movment.x);
+            animator.SetFloat("y", movment.y);
+
+            animator.SetBool("isWalking", true);
+
+        }
+        else
+        {
+            animator.SetBool("isWalking", false);
+
+        }
+    }
+
+    private void OnMovment()
+    {
+
         if ((movment.x != 0 || movment.y != 0))
         {
             animator.SetFloat("x", movment.x);
@@ -216,6 +236,7 @@ public class playerMovment : MonoBehaviour
         yield return new WaitForSeconds(2f);
         transform.position = current;
         canWalk = true;
+        OnMovment();
         transition.SetBool("start", false);
 
     }
@@ -230,6 +251,7 @@ public class playerMovment : MonoBehaviour
         settingsAnimator.SetBool("open", false);
         settingsOpen = false;
         canWalk = true;
+        OnMovment();
     }
     void Update()
     {
@@ -253,6 +275,7 @@ public class playerMovment : MonoBehaviour
                 settingsAnimator.SetBool("open", false);
                 settingsOpen = false;
                 canWalk=true;
+                OnMovment();
             }
             else
             {
@@ -345,7 +368,9 @@ public class playerMovment : MonoBehaviour
         inConvo = false;
         justTalked = true;
         canWalk = true;
+        OnMovment();
         
+
     }
 
     public void startDialogue()
@@ -376,6 +401,7 @@ public class playerMovment : MonoBehaviour
     public void SetWalk(bool walk)
     {
         canWalk = walk;
+        OnMovment();
     }
 
     public Vector2 getPos()
@@ -390,6 +416,7 @@ public class playerMovment : MonoBehaviour
             isHiding = false;
             this.gameObject.GetComponent<SpriteRenderer>().enabled = true;
             canWalk = true;
+            OnMovment();
             this.transform.position = prehidingSpot;
         }
         else

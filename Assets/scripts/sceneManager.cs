@@ -16,6 +16,11 @@ public class sceneManager : MonoBehaviour
 
     }
 
+    public string getScene()
+    {
+        return SceneManager.GetActiveScene().name;
+    }
+
     public void loadLevel(GameObject levelC, GameObject levelD, Vector2 destination, bool same,bool darken,AudioSource music,bool difRoom)
     {
         StartCoroutine(delay(levelC, levelD, destination,same,darken, music, difRoom));

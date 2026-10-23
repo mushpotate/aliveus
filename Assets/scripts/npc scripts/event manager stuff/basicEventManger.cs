@@ -7,6 +7,7 @@ public class basicEventManger : MonoBehaviour
     //day 2 will be the default for imediate changes
     [SerializeField] npcChange[] day2AffectedNPCS;
     [SerializeField] npcChange[] day3AffectedNPCS;
+
     [SerializeField] specialEvents specialEvent;
 
     private bool isActivated = false;
@@ -39,7 +40,7 @@ public class basicEventManger : MonoBehaviour
             //setchanges imediatly
             foreach(npcChange change in day2AffectedNPCS)
             {
-                change.npc.GetComponent<npcTrigger>().ChangeNpc(change.placement,change.defalt,change.dialogue,change.t1,change.t2,change.t3);
+                //change.npc.GetComponent<npcTrigger>().ChangeNpc(change.placement,change.defalt,change.dialogue,change.t1,change.t2,change.t3);
             }
         }
         else

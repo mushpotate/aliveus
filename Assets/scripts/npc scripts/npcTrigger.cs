@@ -5,7 +5,27 @@ using UnityEngine;
 
 public class npcTrigger : MonoBehaviour
 {
-    public Dialogue[] dialogue;
+    //day1Pos day1DefSprite day1Dialogue
+
+    [SerializeField] private Vector2 day1Pos;
+    [SerializeField] private Sprite day1DefSprite;
+    [SerializeField] private Dialogue[] day1Dialogue;
+
+    [SerializeField] private Vector2 day2Pos;
+    [SerializeField] private Sprite day2DefSprite;
+    [SerializeField] private Dialogue[] day2Dialogue;
+
+    [SerializeField] private Vector2 day3Pos;
+    [SerializeField] private Sprite day3DefSprite;
+    [SerializeField] private Dialogue[] day3Dialogue;
+
+    private Dialogue[] dialogue;
+
+    [SerializeField] private bool isCounterD1;
+    [SerializeField] private bool isCounterD2;
+    [SerializeField] private bool isCounterD3;
+    private static float normalColiderOffset = -0.311923f;
+    private static float counterColiderOffset = -1.163474f;
 
     //public Dialogue[] questions;
     //public string[] questionPrompt;
@@ -17,6 +37,8 @@ public class npcTrigger : MonoBehaviour
     //public Dialogue dialogue;
 
     public AudioSource audioSource;
+    [SerializeField] AudioClip voiceClip1;
+    [SerializeField] AudioClip voiceClip2;
     public float defaultPitch;
 
     private bool isTouchingPlayer = false;
@@ -59,10 +81,19 @@ public class npcTrigger : MonoBehaviour
     //2 is left
     //3 is right
     private int direction = 1;
+    private bool justTalked;
+    private playerMovment player;
 
+    private void Awake()
+    {
+        player = FindObjectOfType<playerMovment>();
+        dialogue = day1Dialogue;
+        day1DefSprite = spriteRenderer.sprite;
+    }
     private void Start()
     {
         defaultPitch = audioSource.pitch;
+        
     }
     public void TriggerDialogue()
     {
@@ -203,12 +234,21 @@ public class npcTrigger : MonoBehaviour
 
     public void playAudio()
     {
+        if (Random.Range(1, 3) == 1)
+        {
+            audioSource.clip = voiceClip1;
+        }
+        else
+        {
+            audioSource.clip = voiceClip2;
+        }
         audioSource.pitch = defaultPitch + (Random.Range(-.05f, .05f));
         audioSource.Play(0);
     }
 
     public void resetPos()
     {
+        StartCoroutine(talkWaitTimer());
         spriteRenderer.sprite = defalt;
     }
 
@@ -296,12 +336,7 @@ public class npcTrigger : MonoBehaviour
     {
 
         
-        
-
-        if (FindObjectOfType<playerMovment>().getjustTalked())
-        {
-            StartCoroutine(talkWaitTimer());
-        }
+      
         
 
         TriggerDialogue();
@@ -310,12 +345,23 @@ public class npcTrigger : MonoBehaviour
     }
 
     //one constructer can be used checks if it should change variable by if its null
-    public void ChangeNpc(Vector3 placement, Sprite defalt, Dialogue[] dialogue, Sprite t1, Sprite t2, Sprite t3)
+    public void ChangeNpc(Vector3 placement, Sprite defalt, Dialogue[] newDialogue, Sprite t1, Sprite t2, Sprite t3,bool isCounter)
     {
-        if(placement!= null) this.transform.position = placement;
-        if (defalt != null) this.defalt = defalt;
+        if (placement != Vector3.zero)
+        {
+            this.transform.position = placement;
+            if (isCounter)
+            {
+                this.gameObject.GetComponent<BoxCollider2D>().offset = new Vector2(0,counterColiderOffset);
+            }
+            else
+            {
+                this.gameObject.GetComponent<BoxCollider2D>().offset = new Vector2(0, normalColiderOffset);
+            }
+        }
+        if (defalt != null) this.defalt = defalt; resetPos();
 
-        if (dialogue != null) this.dialogue = dialogue;
+        if (newDialogue.Length != 0) this.dialogue = newDialogue;
         numTimesTalked = 0;
 
         //if one face expresion is changed all should be
@@ -326,5 +372,23 @@ public class npcTrigger : MonoBehaviour
             this.t3 = t3;
         }
       
+    }
+
+
+
+    public void SetNPC(int day)
+    {
+        switch(day)
+        {
+            case 1:
+                ChangeNpc(day1Pos, day1DefSprite, day1Dialogue, t1, t2, t3,isCounterD1);
+                break;
+            case 2:
+                ChangeNpc(day2Pos, day2DefSprite, day2Dialogue, t1, t2, t3,isCounterD2);
+                break;
+            case 3:
+                ChangeNpc(day3Pos, day3DefSprite, day3Dialogue, t1, t2, t3,isCounterD3);
+                break;
+        }
     }
 }

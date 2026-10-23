@@ -5,9 +5,15 @@ using UnityEngine;
 using UnityEngine.UI;
 public class rainScript : MonoBehaviour
 {
-    [SerializeField] bool isRaining = true;
-    [SerializeField] Image lightning;
+    [SerializeField] int lightningFrequencyMin = 20;
+    [SerializeField] int lightningFrequencyMax = 60;
 
+    [SerializeField] bool isRaining = false;
+    [SerializeField] Image lightning;
+    [SerializeField] Image rainDarkness;
+    [SerializeField] GameObject rainEffect;
+
+    [SerializeField] AudioSource rainSound;
     [SerializeField] AudioSource thunderSound;
     [SerializeField] AudioClip loudThunder1;
     [SerializeField] AudioClip loudThunder2;
@@ -20,16 +26,37 @@ public class rainScript : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(raining());
+        //StartCoroutine(raining());
     }
 
+    public void setRain(bool rain)
+    {
+        if(rain)
+        {
+            StartCoroutine(raining());
+            isRaining=true;
+        }
+        else
+        {
+            isRaining = false;
+            StopCoroutine(raining());
+            rainEffect.gameObject.SetActive(false);
+            rainSound.Stop();
+            rainDarkness.gameObject.SetActive(isRaining);
+            //stop rain
+        }
+    }
     IEnumerator raining()
     {
+        yield return new WaitForSeconds(.5f);
+        rainDarkness.gameObject.SetActive(isRaining);
         int rand = 0;
         int randS = Random.Range(0, 2);
+        rainEffect.gameObject.SetActive(true);
+        rainSound.Play();
         while (isRaining)
         {
-            yield return new WaitForSeconds(Random.Range(20,120));
+            yield return new WaitForSeconds(Random.Range(lightningFrequencyMin, lightningFrequencyMax));
             rand = Random.Range(1,4);
             if(rand == 1)
             {
@@ -69,6 +96,8 @@ public class rainScript : MonoBehaviour
 
         }
         
+
+
     }
 
     IEnumerator simLightning(int level)

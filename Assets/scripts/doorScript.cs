@@ -24,6 +24,8 @@ public class doorScript : MonoBehaviour
     public bool isEntryDoor;
     public bool isVertical;
 
+    [SerializeField] private bool outside = false;
+
 
 
     void Awake()
@@ -38,7 +40,10 @@ public class doorScript : MonoBehaviour
 
         if (collision.gameObject.tag == "player")
         {
-            
+            if (outside)
+            {
+                FindFirstObjectByType<weatherManager>().activateWeather();
+            }
             audioSource.Play(0);
             FindObjectOfType<sceneManager>().loadLevel(levelC,levelD,destination,same,darken,music, difRoom);
             
